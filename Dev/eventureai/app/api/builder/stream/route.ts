@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { createMoriGateway } from '@/lib/gateway';
 
 // Agent system prompts
 const AGENT_PROMPTS: Record<string, string> = {
@@ -53,20 +53,25 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    // Support both Mori API keys and direct Anthropic keys
+    const apiKey = process.env.MORI_API_KEY || process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY not configured' }), {
+      return new Response(JSON.stringify({ error: 'MORI_API_KEY or ANTHROPIC_API_KEY not configured' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    const client = new Anthropic({ apiKey });
+    const gateway = createMoriGateway({
+      apiKey,
+      baseUrl: process.env.MORI_GATEWAY_URL,
+      defaultModel: 'claude-sonnet-4-20250514',
+    });
 
     const systemPrompt = AGENT_PROMPTS[agent] || AGENT_PROMPTS.build;
 
-    // Build messages for Claude
-    const messages: Anthropic.Messages.MessageParam[] = [
+    // Build messages
+    const messages = [
       ...conversationHistory.map((m) => ({
         role: m.role as 'user' | 'assistant',
         content: m.content,
@@ -84,44 +89,29 @@ export async function POST(request: NextRequest) {
       try {
         await writer.write(encoder.encode(`data: ${JSON.stringify({ type: 'start', agent })}\n\n`));
 
-        const response = await client.messages.stream({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4096,
-          system: systemPrompt,
-          messages,
-        });
-
-        for await (const event of response) {
-          if (event.type === 'content_block_delta' && 'delta' in event) {
-            const delta = event.delta as { type?: string; text?: string };
-            if (delta.type === 'text_delta' && delta.text) {
-              await writer.write(
-                encoder.encode(`data: ${JSON.stringify({ type: 'delta', text: delta.text })}\n\n`)
-              );
-            }
-          } else if (event.type === 'message_start') {
-            await writer.write(
-              encoder.encode(`data: ${JSON.stringify({ type: 'message_start' })}\n\n`)
-            );
-          } else if (event.type === 'message_stop') {
-            await writer.write(
-              encoder.encode(`data: ${JSON.stringify({ type: 'message_stop' })}\n\n`)
-            );
-          }
-        }
-
-        const finalMessage = await response.finalMessage();
-
-        await writer.write(
-          encoder.encode(
-            JSON.stringify({
-              data: JSON.stringify({
+        const response = await gateway.chatStream(
+          {
+            messages,
+            system: systemPrompt,
+            max_tokens: 4096,
+          },
+          {
+            onStart: (messageId, model) => {
+              writer.write(encoder.encode(`data: ${JSON.stringify({ type: 'message_start', messageId, model })}\n\n`));
+            },
+            onDelta: (text) => {
+              writer.write(encoder.encode(`data: ${JSON.stringify({ type: 'delta', text })}\n\n`));
+            },
+            onComplete: (finalResponse) => {
+              writer.write(encoder.encode(`data: ${JSON.stringify({
                 type: 'done',
-                usage: finalMessage.usage,
-                stopReason: finalMessage.stop_reason,
-              }),
-            }) + '\n\n'
-          )
+                usage: finalResponse.usage,
+              })}\n\n`));
+            },
+            onError: (error) => {
+              writer.write(encoder.encode(`data: ${JSON.stringify({ type: 'error', error: error.message })}\n\n`));
+            },
+          }
         );
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
