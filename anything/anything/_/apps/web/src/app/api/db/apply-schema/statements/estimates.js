@@ -1,0 +1,42 @@
+export const estimatesStatements = [
+  `CREATE TABLE IF NOT EXISTS estimates (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    estimate_number bigserial UNIQUE,
+    customer_id uuid NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
+    job_id uuid REFERENCES jobs(id) ON DELETE SET NULL,
+    status text NOT NULL DEFAULT 'draft',
+    tax_rate numeric(6,4) NOT NULL DEFAULT 0.06,
+    notes text,
+    internal_notes text,
+    created_by_employee_id uuid REFERENCES employees(id) ON DELETE SET NULL,
+    sent_at timestamptz,
+    approved_at timestamptz,
+    rejected_at timestamptz,
+    converted_to_invoice_id uuid,
+    converted_at timestamptz,
+    is_deleted boolean NOT NULL DEFAULT false,
+    deleted_at timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT estimates_status_chk CHECK (status IN ('draft','sent','approved','rejected','expired','converted','cancelled')),
+    CONSTRAINT estimates_tax_rate_chk CHECK (tax_rate >= 0 AND tax_rate <= 1),
+    CONSTRAINT estimates_deleted_at_chk CHECK ((is_deleted = false AND deleted_at IS NULL) OR (is_deleted = true AND deleted_at IS NOT NULL))
+  );`,
+  "CREATE INDEX IF NOT EXISTS estimates_customer_id_idx ON estimates(customer_id);",
+  "CREATE INDEX IF NOT EXISTS estimates_job_id_idx ON estimates(job_id);",
+
+  `CREATE TABLE IF NOT EXISTS estimate_line_items (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    estimate_id uuid NOT NULL REFERENCES estimates(id) ON DELETE CASCADE,
+    service_catalog_item_id uuid REFERENCES service_catalog(id) ON DELETE SET NULL,
+    description text NOT NULL,
+    quantity numeric(12,2) NOT NULL DEFAULT 1,
+    unit_price numeric(12,2) NOT NULL DEFAULT 0,
+    is_taxable boolean NOT NULL DEFAULT true,
+    line_total numeric(12,2) GENERATED ALWAYS AS (round(quantity * unit_price, 2)) STORED,
+    sort_order integer,
+    CONSTRAINT estimate_line_items_qty_chk CHECK (quantity > 0),
+    CONSTRAINT estimate_line_items_unit_price_chk CHECK (unit_price >= 0)
+  );`,
+  "CREATE INDEX IF NOT EXISTS estimate_line_items_estimate_id_idx ON estimate_line_items(estimate_id);",
+];

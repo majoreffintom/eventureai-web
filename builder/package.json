@@ -1,0 +1,18 @@
+{
+  "name": "eventureai-builder",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "cli": "npm run build -w packages/cli && node packages/cli/dist/index.js",
+    "web": "npm run dev -w packages/web",
+    "build": "npm run build --workspaces",
+    "clean": "npm run clean --workspaces"
+  },
+  "devDependencies": {
+    "dotenv": "^17.3.1",
+    "typescript": "^5.0.0"
+  }
+}
