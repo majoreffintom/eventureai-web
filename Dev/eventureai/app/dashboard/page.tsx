@@ -17,7 +17,6 @@ import {
   IOSPrimaryButton 
 } from "@/src/components/ds/index.js";
 import MarketingHeader from "@/src/components/Marketing/MarketingHeader";
-import { supabase } from "@/src/utils/supabase";
 
 export default function OrganizationDashboard() {
   const [organizations, setOrganizations] = useState<any[]>([]);

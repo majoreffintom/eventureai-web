@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/src/utils/supabase";
 
 export default function TestDBPage() {
   const [tenants, setTenants] = useState<any[]>([]);
@@ -9,11 +8,16 @@ export default function TestDBPage() {
 
   useEffect(() => {
     async function fetchTenants() {
-      const { data, error } = await supabase.from("tenants").select("*");
-      if (error) {
-        setError(error.message);
-      } else {
-        setTenants(data || []);
+      try {
+        const response = await fetch("/api/tenants");
+        const data = await response.json();
+        if (data.error) {
+          setError(data.error);
+        } else {
+          setTenants(data);
+        }
+      } catch (err: any) {
+        setError(err.message);
       }
     }
     fetchTenants();
