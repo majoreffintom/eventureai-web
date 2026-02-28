@@ -1,14 +1,10 @@
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+import sql from '@/src/lib/db';
 
 export async function GET() {
   try {
-    const result = await pool.query('SELECT * FROM organizations ORDER BY created_at ASC');
-    return NextResponse.json(result.rows);
+    const result = await sql`SELECT * FROM organizations ORDER BY created_at ASC`;
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error('Database Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -18,11 +14,10 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { name, slug } = await request.json();
-    const result = await pool.query(
-      'INSERT INTO organizations (name, slug, is_public) VALUES ($1, $2, $3) RETURNING *',
-      [name, slug, false]
-    );
-    return NextResponse.json(result.rows[0]);
+    const result = await sql`
+      INSERT INTO organizations (name, slug, is_public) VALUES (${name}, ${slug}, false) RETURNING *
+    `;
+    return NextResponse.json(result[0]);
   } catch (error: any) {
     console.error('Database Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

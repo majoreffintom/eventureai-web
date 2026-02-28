@@ -1,649 +1,214 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { X } from "lucide-react";
-import MarketingHeader from "@/src/components/Marketing/MarketingHeader";
-import {
-  IOSCard,
-  IOSListCard,
-  IOSPrimaryButton,
-} from "@/src/components/ds/index.js";
+import { useState } from "react";
+import { ArrowUpRight, ChevronLeft, ArrowRight } from "lucide-react";
 
-interface MetaTagProps {
-  selector: string;
-  create: () => HTMLElement;
-  set: (el: HTMLElement) => void;
-}
-
-function upsertMetaTag({ selector, create, set }: MetaTagProps) {
-  if (typeof document === "undefined") return;
-  const existing = document.head.querySelector(selector);
-  const el = (existing as HTMLElement) || create();
-  set(el);
-  if (!existing) {
-    document.head.appendChild(el);
-  }
-}
-
-const LOGO_IMAGE_URL =
-  "https://ucarecdn.com/1e36bcdc-49c5-4d7a-b459-f8951a750071/-/format/auto/";
-
-const SPOKE_LINKS = [
-  { slug: "blockchain", label: "Blockchain", href: "/services/blockchain" },
-  { slug: "finance", label: "Finance", href: "/services/finance" },
-  { slug: "integration", label: "Integration", href: "/services/integration" },
-  { slug: "memory", label: "Memory", href: "/services/memory" },
+const SERVICES = [
   {
-    slug: "full-stack-web-dev",
-    label: "Full Stack Web Dev",
-    href: "/services/full-stack-web-dev",
+    num: "01",
+    name: "Blockchain",
+    desc: "Decentralized solutions, smart contracts, and Web3 infrastructure built for enterprise scale. We architect the trust layer for your next-generation applications.",
   },
-  { slug: "seo", label: "SEO", href: "/services/seo" },
-  { slug: "marketing", label: "Marketing", href: "/services/marketing" },
   {
-    slug: "business-consulting",
-    label: "Business Consulting",
-    href: "/services/business-consulting",
+    num: "02",
+    name: "Finance",
+    desc: "Fintech platforms, payment processing, and financial modeling. Intelligent automation that turns complex financial workflows into competitive advantages.",
+  },
+  {
+    num: "03",
+    name: "Integration",
+    desc: "Seamless API orchestration connecting every system in your stack. We eliminate silos and create unified data flows across your entire organization.",
+  },
+  {
+    num: "04",
+    name: "Memory",
+    desc: "Persistent AI memory layers that learn, adapt, and evolve. Your AI doesn't just respond — it remembers, contextualizes, and anticipates.",
+  },
+  {
+    num: "05",
+    name: "Full Stack Web Dev",
+    desc: "End-to-end web applications built with modern frameworks. From concept to deployment, we ship production-grade software that scales.",
+  },
+  {
+    num: "06",
+    name: "SEO",
+    desc: "Data-driven search optimization that compounds over time. We don't chase algorithms — we build organic authority that lasts.",
+  },
+  {
+    num: "07",
+    name: "Marketing",
+    desc: "AI-enhanced marketing strategies that convert attention into measurable, repeatable growth across every channel that matters.",
+  },
+  {
+    num: "08",
+    name: "Business Consulting",
+    desc: "Strategic advisory that bridges the gap between technology capability and business transformation. We see the whole picture.",
   },
 ];
 
-const SERVICE_CONTENT = {
-  blockchain: {
-    title: "Blockchain",
-    teaser:
-      "Smart contracts, token flows, wallet sign-in, and on-chain audit trails.",
-    details:
-      "We build real blockchain features that make your app provable and trustworthy: smart contracts, token / NFT flows, wallet sign-in (MetaMask), and on-chain audit trails so your app can prove what happened and when. We can design Polygon-based builds, transaction histories, and verifiable records that support compliance, transparency, and user trust.",
-    bullets: [
-      "Smart contracts + token/NFT flows",
-      "Wallet sign-in (MetaMask) and user journeys",
-      "Audit trails: prove what happened + when",
-      "Polygon-based builds and integrations",
-    ],
-  },
-  finance: {
-    title: "Finance",
-    teaser:
-      "Stripe, invoices/subscriptions, dashboards, automation, and clean exports.",
-    details:
-      "CPA-led finance systems that actually ship. We wire up Stripe for subscriptions and one-time payments, automate invoices, build dashboards, and create exports that match real bookkeeping and tax workflows. The goal: accurate records, fewer manual steps, and a system you can trust month after month.",
-    bullets: [
-      "Stripe subscriptions + payments",
-      "Invoices + receipts",
-      "Dashboards + reporting",
-      "Bookkeeping-friendly exports",
-    ],
-  },
-  integration: {
-    title: "Integration",
-    teaser: "Connect your tools so data moves without copy/paste.",
-    details:
-      "We connect tools and data sources so your team isn't stuck copying and pasting all day. That can mean webhooks, API integrations, middleware, automation, and syncing data between your CRM, email platform, payments, analytics, and internal database — reliably.",
-    bullets: [
-      "APIs + webhooks",
-      "Automation + sync",
-      "Clean data flow between tools",
-      "Less manual work for your team",
-    ],
-  },
-  memory: {
-    title: "Memory",
-    teaser:
-      "Structured AI memory so your app can remember and reuse what matters.",
-    details:
-      "We build structured AI memory so your app can remember, search, and reuse what matters. Instead of losing context, your assistant can reference past conversations, documents, and key decisions — so users get better answers and you avoid repeating the same intake questions.",
-    bullets: [
-      "Searchable memory",
-      "Better follow-ups",
-      "Less repetition",
-      "Safer long-term context",
-    ],
-  },
-  "full-stack-web-dev": {
-    title: "Full Stack Web Dev",
-    teaser: "End-to-end build: UI, APIs, database, deployment.",
-    details:
-      "Full stack means end-to-end delivery: the pages people use, the APIs behind them, and the database systems that keep it reliable. We can also add features inside existing apps. The focus is simple: ship stable software that works on mobile and desktop, and can grow with your business.",
-    bullets: [
-      "React pages people use",
-      "Backend APIs",
-      "Database design",
-      "Production shipping + maintenance",
-    ],
-  },
-  seo: {
-    title: "SEO",
-    teaser: "Technical SEO and site structure that compounds.",
-    details:
-      "Technical SEO cleanup, content structure, and site speed improvements that help you rank. We focus on the stuff Google actually rewards: clean structure, fast load, proper headings, schema markup, internal linking, and making sure your pages clearly explain who you help and what you do.",
-    bullets: [
-      "Core Web Vitals + site speed",
-      "Schema markup",
-      "Internal linking + structure",
-      "Content systems that scale",
-    ],
-  },
-  marketing: {
-    title: "Marketing",
-    teaser: "Pages, funnels, experiments, and tracking that drives leads.",
-    details:
-      "Funnels, landing pages, messaging, and simple experiments that drive real leads. We write clear copy, build fast pages, and set up tracking so you can see what works. No fluff — just the work that turns attention into action.",
-    bullets: [
-      "Landing pages + funnels",
-      "Copy + positioning",
-      "Tracking + measurement",
-      "Iteration that improves results",
-    ],
-  },
-  "business-consulting": {
-    title: "Business Consulting",
-    teaser: "Offer clarity, pricing, process, and execution with tech support.",
-    details:
-      "Process, pricing, positioning, and execution support — with the tech to back it up. If you need clear decisions, an operating plan, and the software/automation to execute it, we can help you get focused and moving.",
-    bullets: [
-      "Offer + positioning clarity",
-      "Pricing + packaging",
-      "Systems + execution",
-      "Tech to support the plan",
-    ],
-  },
-};
-
-export default function MarketingHomePage() {
-  const [pageUrl, setPageUrl] = useState<string | null>(null);
-  const [selectedService, setSelectedService] = useState<string | null>(null);
-
-  const selectedContent = selectedService
-    ? SERVICE_CONTENT[selectedService as keyof typeof SERVICE_CONTENT]
-    : null;
-  const learnMoreHref = selectedService ? `/services/${selectedService}` : null;
-
-  // Native-ish swipe-to-close (drag right) for the slide-in panel
-  const dragStartXRef = useRef<number | null>(null);
-  const [dragX, setDragX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-
-  const resetDrag = () => {
-    dragStartXRef.current = null;
-    setIsDragging(false);
-    setDragX(0);
-  };
-
-  const onDragStart = (e: React.TouchEvent) => {
-    if (!selectedContent) return;
-    const touch = e.touches?.[0];
-    if (!touch) return;
-    dragStartXRef.current = touch.clientX;
-    setIsDragging(true);
-  };
-
-  const onDragMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const touch = e.touches?.[0];
-    if (!touch) return;
-    const startX = dragStartXRef.current;
-    if (typeof startX !== "number") return;
-    const dx = Math.max(0, touch.clientX - startX);
-    setDragX(dx);
-  };
-
-  const onDragEnd = () => {
-    if (!isDragging) return;
-    const shouldClose = dragX > 110;
-    if (shouldClose) {
-      setSelectedService(null);
-    }
-    resetDrag();
-  };
-
-  const seo = useMemo(() => {
-    const title =
-      "EventureAI | CPA-led AI, Blockchain, Full Stack Development & SEO";
-    const description =
-      "Built by a 25-year CPA and systems architect. We build practical AI + automation, blockchain and digital asset systems, full stack web apps, and technical SEO that compounds.";
-
-    return {
-      title,
-      description,
-      image: LOGO_IMAGE_URL,
-    };
-  }, []);
-
-  const structuredDataJson = useMemo(() => {
-    const canonicalUrl = pageUrl || "https://eventureai.com/";
-
-    const json = {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Organization",
-          name: "EventureAI",
-          url: canonicalUrl,
-          logo: seo.image,
-          description: seo.description,
-          sameAs: [],
-        },
-        {
-          "@type": "WebSite",
-          name: "EventureAI",
-          url: canonicalUrl,
-        },
-        {
-          "@type": "WebPage",
-          name: seo.title,
-          url: canonicalUrl,
-          description: seo.description,
-        },
-      ],
-    };
-
-    return JSON.stringify(json);
-  }, [pageUrl, seo.description, seo.image, seo.title]);
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-
-    if (typeof window !== "undefined") {
-      setPageUrl(window.location.href);
-    }
-
-    document.title = seo.title;
-
-    upsertMetaTag({
-      selector: 'meta[name="description"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("name", "description");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", seo.description),
-    });
-
-    upsertMetaTag({
-      selector: 'meta[name="robots"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("name", "robots");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", "index,follow"),
-    });
-
-    upsertMetaTag({
-      selector: 'meta[property="og:title"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("property", "og:title");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", seo.title),
-    });
-
-    upsertMetaTag({
-      selector: 'meta[property="og:description"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("property", "og:description");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", seo.description),
-    });
-
-    upsertMetaTag({
-      selector: 'meta[property="og:type"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("property", "og:type");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", "website"),
-    });
-
-    upsertMetaTag({
-      selector: 'meta[property="og:image"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("property", "og:image");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", seo.image),
-    });
-
-    upsertMetaTag({
-      selector: 'meta[property="og:site_name"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("property", "og:site_name");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", "EventureAI"),
-    });
-
-    if (pageUrl) {
-      upsertMetaTag({
-        selector: 'meta[property="og:url"]',
-        create: () => {
-          const el = document.createElement("meta");
-          el.setAttribute("property", "og:url");
-          return el;
-        },
-        set: (el) => el.setAttribute("content", pageUrl),
-      });
-
-      upsertMetaTag({
-        selector: 'link[rel="canonical"]',
-        create: () => {
-          const el = document.createElement("link");
-          el.setAttribute("rel", "canonical");
-          return el;
-        },
-        set: (el) => el.setAttribute("href", pageUrl),
-      });
-    }
-
-    upsertMetaTag({
-      selector: 'meta[name="twitter:card"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("name", "twitter:card");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", "summary_large_image"),
-    });
-
-    upsertMetaTag({
-      selector: 'meta[name="twitter:title"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("name", "twitter:title");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", seo.title),
-    });
-
-    upsertMetaTag({
-      selector: 'meta[name="twitter:description"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("name", "twitter:description");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", seo.description),
-    });
-
-    upsertMetaTag({
-      selector: 'meta[name="twitter:image"]',
-      create: () => {
-        const el = document.createElement("meta");
-        el.setAttribute("name", "twitter:image");
-        return el;
-      },
-      set: (el) => el.setAttribute("content", seo.image),
-    });
-  }, [pageUrl, seo.description, seo.image, seo.title]);
-
-  // Lock background scroll for native-app feel
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    if (!selectedContent) return;
-
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [selectedContent]);
-
-  // Escape-to-close
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!selectedContent) return;
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedService(null);
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedContent]);
-
-  const backdropOpacity = 1 - Math.min(1, dragX / 320);
+export default function SwissConcept() {
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
   return (
-    <div
-      className="text-black min-h-screen"
-      style={{ backgroundColor: "#F2F2F7" }}
-    >
-      <script type="application/ld+json">{structuredDataJson}</script>
-
-      <MarketingHeader />
-
-      {/* Apple-style liquid glass overlay (stays on the homepage) */}
-      {selectedContent ? (
-        <>
-          {/* Backdrop with blur (tap to close) */}
-          <button
-            type="button"
-            aria-label="Close overlay"
-            onClick={() => setSelectedService(null)}
-            className="fixed inset-0 z-40 w-full h-full backdrop-blur-md"
-            style={{ backgroundColor: `rgba(0,0,0,${0.45 * backdropOpacity})` }}
-          />
-
-          {/* Slide-in panel (swipe right to close) */}
-          <div
-            className="fixed inset-y-0 right-0 z-50 w-full sm:w-[480px] text-white"
-            onTouchStart={onDragStart}
-            onTouchMove={onDragMove}
-            onTouchEnd={onDragEnd}
-            onTouchCancel={onDragEnd}
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(10,10,10,0.96) 0%, rgba(10,10,10,0.90) 45%, rgba(10,10,10,0.96) 100%)",
-              boxShadow: "-30px 0 60px rgba(0,0,0,0.45)",
-              borderLeft: "1px solid rgba(255,255,255,0.10)",
-              transform: `translateX(${dragX}px)`,
-              transition: isDragging
-                ? "none"
-                : "transform 220ms cubic-bezier(0.16, 1, 0.3, 1)",
-              animation: isDragging
-                ? "none"
-                : "eventureSlideInRight 520ms cubic-bezier(0.16, 1, 0.3, 1) both",
-            }}
-          >
-            {/* Frosted top bar */}
-            <div
-              className="sticky top-0 z-10 px-4 sm:px-6 py-4"
-              style={{
-                backgroundColor: "rgba(255,255,255,0.06)",
-                WebkitBackdropFilter: "blur(18px)",
-                backdropFilter: "blur(18px)",
-                borderBottom: "1px solid rgba(255,255,255,0.10)",
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => setSelectedService(null)}
-                  aria-label="Close"
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-full active:scale-95 transition-transform"
-                  style={{
-                    backgroundColor: "rgba(255,255,255,0.10)",
-                    border: "1px solid rgba(255,255,255,0.16)",
-                  }}
-                >
-                  <X size={20} color="white" />
-                </button>
-
-                <div className="text-[10px] tracking-[0.22em] text-white/70">
-                  SERVICE
-                </div>
-
-                <div className="w-10" />
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="h-full overflow-y-auto px-4 sm:px-6 pb-10">
-              <div className="pt-8">
-                <div
-                  className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-semibold tracking-widest uppercase"
-                  style={{
-                    backgroundColor: "rgba(255,255,255,0.08)",
-                    border: "1px solid rgba(255,255,255,0.14)",
-                  }}
-                >
-                  {selectedContent.title}
-                </div>
-
-                <h2
-                  className="mt-4 text-4xl sm:text-5xl font-semibold tracking-tight"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.78) 100%)",
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  {selectedContent.title}
-                </h2>
-
-                <p className="mt-6 text-base sm:text-lg text-white/80 leading-relaxed font-light">
-                  {selectedContent.details}
-                </p>
-
-                <div
-                  className="mt-8 rounded-2xl p-5 sm:p-6"
-                  style={{
-                    backgroundColor: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.10)",
-                    WebkitBackdropFilter: "blur(20px)",
-                    backdropFilter: "blur(20px)",
-                  }}
-                >
-                  <div className="text-xs tracking-widest text-white/60">
-                    WHAT WE DO
-                  </div>
-                  <ul className="mt-4 space-y-3">
-                    {selectedContent.bullets.map((line) => (
-                      <li key={line} className="flex gap-3 items-start">
-                        <span
-                          className="mt-[9px] w-[6px] h-[6px] rounded-full"
-                          style={{ backgroundColor: "rgba(255,255,255,0.55)" }}
-                        />
-                        <span className="text-sm sm:text-base text-white/78 leading-relaxed">
-                          {line}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {learnMoreHref ? (
-                  <div className="mt-10">
-                    <IOSPrimaryButton href={learnMoreHref}>
-                      <span className="flex items-center gap-2">
-                        Click here to learn more
-                        <span className="transition-transform duration-200 group-hover:translate-x-1">
-                          →
-                        </span>
-                      </span>
-                    </IOSPrimaryButton>
-
-                    <div className="mt-4 text-center text-xs text-white/45">
-                      Tip: tap outside the panel, swipe right, or press Esc to
-                      close.
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          </div>
-        </>
-      ) : null}
-
-      <main className="w-full">
-        <section
-          id="launchpad"
-          className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-10"
+    <div className="min-h-screen bg-[#FAFAF8] text-[#111]">
+      {/* Navigation */}
+      <nav className="flex items-center justify-between px-6 sm:px-12 lg:px-20 py-6 border-b border-black/[0.06]">
+        <a
+          href="/concepts"
+          className="flex items-center gap-2 text-black/30 hover:text-black/60 text-sm transition-colors"
         >
-          <div className="w-full max-w-2xl">
-            <IOSCard className="p-6 sm:p-8">
-              <div className="flex items-center justify-center">
-                <img
-                  src={LOGO_IMAGE_URL}
-                  alt="EventureAI"
-                  className="w-[200px] h-[200px] object-contain"
-                />
-              </div>
+          <ChevronLeft size={14} />
+          <span>Concepts</span>
+        </a>
+        <div className="font-urbanist font-semibold text-lg tracking-tight">
+          EventureAI
+        </div>
+        <div className="flex items-center gap-6">
+          <a
+            href="#services"
+            className="hidden sm:inline text-sm text-black/50 hover:text-black transition-colors"
+          >
+            Services
+          </a>
+          <a
+            href="#contact"
+            className="text-sm text-black/80 hover:text-black transition-colors flex items-center gap-1"
+          >
+            Contact <ArrowUpRight size={12} />
+          </a>
+        </div>
+      </nav>
 
-              <h1 className="mt-6 text-center text-3xl sm:text-4xl tracking-wide font-semibold">
-                CPA-led systems that ship.
-              </h1>
-              <p className="mt-3 text-center text-sm sm:text-base text-black/70">
-                We build practical AI + automation, blockchain and digital asset
-                systems, full stack web apps, and technical SEO.
-              </p>
+      {/* Hero */}
+      <section className="px-6 sm:px-12 lg:px-20 pt-20 sm:pt-32 lg:pt-40 pb-16 sm:pb-24 lg:pb-32">
+        <h1 className="font-urbanist font-medium text-[clamp(2.5rem,8vw,8rem)] leading-[0.9] tracking-tight text-[#111] max-w-[1200px]">
+          We build the
+          <br />
+          infrastructure behind
+          <br />
+          <span className="text-black/15">ambitious companies.</span>
+        </h1>
+      </section>
 
-              <div className="mt-8">
-                <div className="text-xs tracking-widest text-black/60">
-                  SERVICES
+      {/* Divider */}
+      <div className="px-6 sm:px-12 lg:px-20">
+        <div className="h-px bg-black/[0.08]" />
+      </div>
+
+      {/* Services List */}
+      <section id="services" className="px-6 sm:px-12 lg:px-20 py-16 sm:py-24">
+        <div className="flex items-baseline justify-between mb-10">
+          <span className="text-black/25 font-mono text-xs tracking-[0.2em] uppercase">
+            Services
+          </span>
+          <span className="text-black/25 font-mono text-xs">8 Verticals</span>
+        </div>
+
+        <div>
+          {SERVICES.map((s, i) => {
+            const isExpanded = expandedIdx === i;
+            return (
+              <div key={s.num}>
+                <div
+                  className="group flex items-baseline gap-4 sm:gap-8 py-5 sm:py-6 cursor-pointer"
+                  onClick={() => setExpandedIdx(isExpanded ? null : i)}
+                >
+                  <span className="font-mono text-xs text-black/20 shrink-0 w-6">
+                    {s.num}
+                  </span>
+                  <h3 className="font-urbanist font-medium text-2xl sm:text-3xl md:text-4xl tracking-tight text-[#111] group-hover:text-emerald-600 transition-colors duration-300 flex-1">
+                    {s.name}
+                  </h3>
+                  <div
+                    className={`w-8 h-8 rounded-full border border-black/10 flex items-center justify-center shrink-0 group-hover:border-emerald-500 group-hover:bg-emerald-500 transition-all duration-300 ${isExpanded ? "bg-emerald-500 border-emerald-500" : ""}`}
+                  >
+                    <ArrowRight
+                      size={14}
+                      className={`transition-all duration-300 ${isExpanded ? "rotate-90 text-white" : "text-black/30 group-hover:text-white"}`}
+                    />
+                  </div>
                 </div>
 
-                <IOSListCard className="mt-3">
-                  <div className="divide-y divide-black/5">
-                    {SPOKE_LINKS.map((item) => {
-                      const content = SERVICE_CONTENT[item.slug as keyof typeof SERVICE_CONTENT];
-                      const description = content
-                        ? content.teaser
-                        : "Learn more about how we deliver this.";
-
-                      return (
-                        <button
-                          key={item.href}
-                          type="button"
-                          onClick={() => setSelectedService(item.slug)}
-                          className="block w-full text-left px-4 py-4 active:bg-black/5"
-                        >
-                          <div className="text-base tracking-wide font-semibold">
-                            {item.label}
-                          </div>
-                          <div className="mt-1 text-sm text-black/70">
-                            {description}
-                          </div>
-                        </button>
-                      );
-                    })}
+                {/* Expanded description */}
+                <div
+                  className="overflow-hidden transition-all duration-500"
+                  style={{
+                    maxHeight: isExpanded ? "200px" : "0px",
+                    opacity: isExpanded ? 1 : 0,
+                  }}
+                >
+                  <div className="pl-10 sm:pl-14 pb-6 max-w-2xl">
+                    <p className="text-black/40 text-sm sm:text-base leading-relaxed">
+                      {s.desc}
+                    </p>
                   </div>
-                </IOSListCard>
-              </div>
+                </div>
 
-              <div className="mt-8 text-xs text-black/55">
-                Built by a 25-year CPA, DBA, entrepreneur, and full stack
-                developer.
+                <div className="h-px bg-black/[0.06]" />
               </div>
-            </IOSCard>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Quote */}
+      <section className="px-6 sm:px-12 lg:px-20 py-20 sm:py-32">
+        <div className="max-w-4xl">
+          <blockquote className="font-urbanist font-medium text-3xl sm:text-5xl leading-[1.1] tracking-tight text-[#111] mb-8">
+            "Your vision.
+            <br />
+            <span className="text-emerald-600">Our architecture."</span>
+          </blockquote>
+          <p className="text-black/30 text-sm font-mono tracking-wider">
+            — EventureAI
+          </p>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section
+        id="contact"
+        className="px-6 sm:px-12 lg:px-20 py-16 sm:py-24 border-t border-black/[0.06]"
+      >
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-8">
+          <div>
+            <span className="text-black/25 font-mono text-xs tracking-[0.2em] uppercase block mb-4">
+              Get in touch
+            </span>
+            <a
+              href="mailto:hello@eventureai.com"
+              className="font-urbanist font-medium text-2xl sm:text-4xl tracking-tight text-[#111] hover:text-emerald-600 transition-colors border-b-2 border-black/10 hover:border-emerald-600 pb-1"
+            >
+              hello@eventureai.com
+            </a>
           </div>
-        </section>
-      </main>
+          <div className="text-right">
+            <p className="text-black/30 text-sm">Multi-Tenant AI Platform</p>
+            <p className="text-black/30 text-sm">8 Specialized Verticals</p>
+          </div>
+        </div>
+      </section>
 
-      {/* Animations only */}
+      {/* Footer */}
+      <footer className="border-t border-black/[0.06] py-6 px-6 sm:px-12 lg:px-20">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-black/20 text-xs font-mono">
+            © 2026 EventureAI
+          </div>
+          <div className="flex items-center gap-6 text-black/20 text-xs font-mono">
+            <a href="#" className="hover:text-black/50 transition-colors">
+              Privacy
+            </a>
+            <a href="#" className="hover:text-black/50 transition-colors">
+              Terms
+            </a>
+          </div>
+        </div>
+      </footer>
+
       <style jsx global>{`
-        @keyframes eventureSlideInRight {
-          0% {
-            transform: translateX(102%);
-          }
-          60% {
-            transform: translateX(-0.5%);
-          }
-          100% {
-            transform: translateX(0%);
-          }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap');
+        .font-urbanist { font-family: 'Urbanist', sans-serif; }
       `}</style>
     </div>
   );

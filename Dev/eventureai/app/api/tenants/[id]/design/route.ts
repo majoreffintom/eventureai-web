@@ -1,9 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+import sql from '@/src/lib/db';
 
 export async function PATCH(
   request: Request,
@@ -13,16 +9,15 @@ export async function PATCH(
     const { designId } = await request.json();
     const { id } = params;
 
-    const result = await pool.query(
-      'UPDATE tenants SET design_id = $1 WHERE id = $2 RETURNING *',
-      [designId, id]
-    );
+    const result = await sql`
+      UPDATE tenants SET design_id = ${designId} WHERE id = ${id} RETURNING *
+    `;
 
-    if (result.rowCount === 0) {
+    if (result.length === 0) {
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
     }
 
-    return NextResponse.json(result.rows[0]);
+    return NextResponse.json(result[0]);
   } catch (error: any) {
     console.error('Database Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
