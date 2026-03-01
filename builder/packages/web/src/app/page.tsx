@@ -18,18 +18,20 @@ import {
   Hammer,
   Database,
   Layers,
-  MessageSquare
+  MessageSquare,
+  Ticket,
+  Image as ImageIcon
 } from "lucide-react";
 
 const ecosystemApps = [
-  { name: "Heymori CMS", description: "Headless content management for the AI era.", icon: Database },
-  { name: "SwarMCP", description: "Multi-agent coordination via intelligent chat interface.", icon: MessageSquare },
-  { name: "StreetEats", description: "Autonomous logistics & ordering for mobile vendors.", icon: Utensils },
-  { name: "Peggy", description: "Next-gen personal finance & automated accounting.", icon: Smartphone },
-  { name: "Ditzl", description: "Social engagement & decentralized community tools.", icon: Sparkles },
-  { name: "Nifty", description: "Digital asset management & rapid NFT deployment.", icon: Box },
-  { name: "Lumina", description: "AI-driven visual design & asset generation.", icon: Sun },
-  { name: "Contractor OS", description: "White-label HVAC, Electric, & Plumbing management.", icon: Hammer },
+  { name: "SwarMCP.com", description: "The flagship app builder. Visual logic & AI swarm orchestration.", icon: Zap, href: "https://swarmcp.com" },
+  { name: "Heymori.com", description: "Autonomous CRM & personal assistant. Your AI-driven memory engine.", icon: Database, href: "https://heymori.com" },
+  { name: "Ditzl.com", description: "Next-gen ticketing & event management. Secure, social, and seamless.", icon: Ticket, href: "https://ditzl.com" },
+  { name: "StreetEatsMap.com", description: "Autonomous logistics & real-time mapping for food truck vendors.", icon: Utensils, href: "https://streeteatsmap.com" },
+  { name: "BeTheFirstNFT.com", description: "Web3 minting vehicle. Integrated NFT art for digital tickets.", icon: ImageIcon, href: "https://bethefirstnft.com" },
+  { name: "Peggy.com", description: "Next-gen personal finance & automated accounting on the stack.", icon: Smartphone, href: "#" },
+  { name: "Lumina.ai", description: "AI-driven visual design & asset generation for all tenants.", icon: Sun, href: "#" },
+  { name: "Contractor OS", description: "The integrated OS for HVAC, Electric, & Plumbing contractors.", icon: Hammer, href: "#" },
 ];
 
 export default function Home() {
@@ -39,7 +41,7 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 px-6 py-6 md:px-12 flex justify-between items-end border-b border-zinc-100 bg-white/80 backdrop-blur-sm">
         <div className="flex flex-col">
           <span className="text-2xl font-bold tracking-tighter leading-none">EVENTUREAI</span>
-          <span className="text-[10px] uppercase tracking-widest font-medium text-zinc-400 mt-1">EST. 2024</span>
+          <span className="text-[10px] uppercase tracking-widest font-medium text-zinc-400 mt-1">EST. 2024 / THE STUDIO</span>
         </div>
         <div className="flex gap-8 text-sm font-medium">
           <a href="#demo" className="hover:text-zinc-500 transition-colors">DEMO</a>
@@ -62,21 +64,21 @@ export default function Home() {
               BUILD<br />THINGS<br />BETTER.
             </h1>
             <p className="text-xl md:text-2xl font-normal text-zinc-500 max-w-md leading-tight mb-12">
-              The next generation of visual app building. Integrated AI swarms, instant deployment, and absolute minimalism.
+              EventureAI is a venture studio for the autonomous era. We build integrated SaaS modules powered by the webMCP engine.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
                 href="/builder"
                 className="inline-flex items-center justify-center px-8 py-4 bg-black text-white text-sm font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all group"
               >
-                Build for Free
+                Launch SwarMCP
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
               </Link>
               <a 
                 href="#demo"
                 className="inline-flex items-center justify-center px-8 py-4 border border-zinc-200 text-sm font-bold uppercase tracking-widest hover:bg-zinc-50 transition-all"
               >
-                Watch Demo
+                Explore Stack
               </a>
             </div>
           </div>
@@ -93,11 +95,11 @@ export default function Home() {
                    <div className="w-3 h-3 rounded-full bg-zinc-100" />
                    <div className="w-3 h-3 rounded-full bg-zinc-100" />
                    <div className="w-3 h-3 rounded-full bg-zinc-100" />
-                   <div className="ml-auto text-[10px] text-zinc-400 font-mono tracking-tighter uppercase">EVENTURE_PREVIEW</div>
+                   <div className="ml-auto text-[10px] text-zinc-400 font-mono tracking-tighter uppercase">SWARMCP_SYSTEM</div>
                  </div>
                  <div className="flex-1 flex flex-col justify-center items-center gap-4 text-center">
                     <div className="w-12 h-12 bg-black text-white rounded-lg flex items-center justify-center mb-2">
-                       <Wand2 size={24} />
+                       <Zap size={24} />
                     </div>
                     <div className="h-4 w-32 bg-zinc-100 rounded" />
                     <div className="h-4 w-48 bg-zinc-50 rounded" />
@@ -106,7 +108,7 @@ export default function Home() {
                </motion.div>
             </div>
             <div className="mt-8">
-               <span className="text-xs uppercase tracking-[0.2em] font-bold text-zinc-300">Proprietary System / v1.0.4</span>
+               <span className="text-xs uppercase tracking-[0.2em] font-bold text-zinc-300">Proprietary Stack / v1.0.4</span>
             </div>
           </div>
         </motion.div>
@@ -117,19 +119,19 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 gap-8">
             <div className="max-w-xl">
-              <h2 className="text-4xl font-bold tracking-tighter mb-4 uppercase">The App Builder.</h2>
+              <h2 className="text-4xl font-bold tracking-tighter mb-4 uppercase">The Core Engine.</h2>
               <p className="text-lg text-zinc-500 leading-snug">
-                Drag, drop, and let the AI do the heavy lifting. Deploy to a custom subdomain instantly. Free forever for individuals.
+                Every tenant in our ecosystem is built using **SwarMCP**. It’s the visual builder, AI orchestrator, and deployment engine that drives our growth.
               </p>
             </div>
             <div className="flex gap-4">
                <div className="p-4 bg-white border border-zinc-100 flex flex-col gap-1 w-32">
-                  <span className="text-[10px] font-bold text-zinc-400">USERS</span>
+                  <span className="text-[10px] font-bold text-zinc-400">NODES</span>
                   <span className="text-xl font-bold tracking-tighter">1,200+</span>
                </div>
                <div className="p-4 bg-white border border-zinc-100 flex flex-col gap-1 w-32">
-                  <span className="text-[10px] font-bold text-zinc-400">APPS</span>
-                  <span className="text-xl font-bold tracking-tighter">4,800+</span>
+                  <span className="text-[10px] font-bold text-zinc-400">TENANTS</span>
+                  <span className="text-xl font-bold tracking-tighter">8+</span>
                </div>
             </div>
           </div>
@@ -142,7 +144,7 @@ export default function Home() {
                   <div className="w-2.5 h-2.5 rounded-full bg-zinc-200" />
                </div>
                <div className="bg-white border border-zinc-200 rounded px-3 py-1 text-[10px] text-zinc-400 font-mono flex-1 max-w-xs truncate">
-                  builder.eventureai.com/your-project
+                  builder.swarmcp.com/project-delta
                </div>
             </div>
             
@@ -186,10 +188,10 @@ export default function Home() {
       <section id="ecosystem" className="py-24 px-6 md:px-12 border-t border-zinc-100 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col mb-16">
-            <h2 className="text-4xl font-bold tracking-tighter mb-4 uppercase">The SaaS Stack.</h2>
+            <h2 className="text-4xl font-bold tracking-tighter mb-4 uppercase">The Venture Stack.</h2>
             <p className="text-lg text-zinc-500 leading-snug max-w-2xl">
-              An ever-growing ecosystem of specialized SaaS applications built entirely on webMCP. 
-              From headless CMS to autonomous logistics.
+              EventureAI powers a specialized fleet of autonomous SaaS applications. 
+              Integrated via the **webMCP Engine** and deployed instantly.
             </p>
           </div>
 
@@ -201,15 +203,22 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 viewport={{ once: true }}
-                className="bg-white p-8 group hover:bg-zinc-50 transition-colors"
+                className="bg-white p-8 group hover:bg-zinc-50 transition-colors flex flex-col"
               >
                 <div className="w-10 h-10 bg-black text-white rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <app.icon size={20} />
                 </div>
                 <h3 className="text-sm font-bold uppercase tracking-widest mb-2">{app.name}</h3>
-                <p className="text-xs text-zinc-400 leading-relaxed font-medium">
+                <p className="text-xs text-zinc-400 leading-relaxed font-medium mb-6 flex-1">
                   {app.description}
                 </p>
+                <a 
+                  href={app.href} 
+                  target="_blank" 
+                  className="text-[10px] font-bold uppercase tracking-widest text-zinc-300 group-hover:text-black transition-colors flex items-center gap-2"
+                >
+                  Visit App <ArrowRight size={10} />
+                </a>
               </motion.div>
             ))}
           </div>
@@ -217,11 +226,11 @@ export default function Home() {
           <div className="mt-12 flex justify-between items-center py-8 border-t border-zinc-100">
              <div className="flex items-center gap-2">
                 <Layers className="text-zinc-200" size={16} />
-                <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Powered by webMCP Engine</span>
+                <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Powered by webMCP v4.0.1</span>
              </div>
-             <a href="#" className="text-[10px] font-bold uppercase tracking-widest hover:text-zinc-400 transition-colors flex items-center gap-2">
-                View Full Stack <ArrowRight size={12} />
-             </a>
+             <Link href="/builder" className="text-[10px] font-bold uppercase tracking-widest hover:text-zinc-400 transition-colors flex items-center gap-2">
+                Launch SwarMCP <ArrowRight size={12} />
+             </Link>
           </div>
         </div>
       </section>
@@ -232,10 +241,10 @@ export default function Home() {
           <div className="relative">
             <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/5 blur-3xl rounded-full" />
             <div className="relative z-10">
-              <span className="inline-block px-3 py-1 bg-white/10 text-[10px] font-bold tracking-widest uppercase mb-6">FEATURED CASE STUDY</span>
+              <span className="inline-block px-3 py-1 bg-white/10 text-[10px] font-bold tracking-widest uppercase mb-6">FEATURED TENANT</span>
               <h2 className="text-6xl font-bold tracking-tighter mb-8 leading-[0.9]">HEYMORI.COM</h2>
               <p className="text-xl text-zinc-400 leading-snug mb-12 max-w-md">
-                Discover the power of EventureAI through Heymori, a fully autonomous personal assistant built entirely within our ecosystem.
+                Experience the power of our stack through Heymori, a fully autonomous personal assistant and CRM built entirely with SwarMCP.
               </p>
               <a 
                 href="https://heymori.com" 
@@ -295,13 +304,14 @@ export default function Home() {
       <footer className="py-24 px-6 md:px-12 border-t border-zinc-100 flex flex-col md:flex-row justify-between items-start gap-12">
         <div className="flex flex-col">
           <span className="text-xl font-bold tracking-tighter">EVENTUREAI</span>
-          <span className="text-[10px] text-zinc-400 mt-2 uppercase tracking-[0.2em] font-medium">© 2024 Geometry OS. All rights reserved.</span>
+          <span className="text-[10px] text-zinc-400 mt-2 uppercase tracking-[0.2em] font-medium">© 2024 EventureAI Corporation. All rights reserved.</span>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-12 text-xs font-bold tracking-widest uppercase">
           <div className="flex flex-col gap-4">
-            <span className="text-zinc-300">PLATFORM</span>
-            <Link href="/builder" className="hover:text-zinc-500">Builder</Link>
-            <a href="#" className="hover:text-zinc-500">API</a>
+            <span className="text-zinc-300">CORE MODULES</span>
+            <a href="https://swarmcp.com" className="hover:text-zinc-500">SwarMCP</a>
+            <a href="https://heymori.com" className="hover:text-zinc-500">Heymori</a>
+            <a href="https://ditzl.com" className="hover:text-zinc-500">Ditzl</a>
           </div>
           <div className="flex flex-col gap-4">
             <span className="text-zinc-300">RESOURCES</span>
@@ -309,7 +319,7 @@ export default function Home() {
             <a href="#" className="hover:text-zinc-500">Guides</a>
           </div>
           <div className="flex flex-col gap-4">
-            <span className="text-zinc-300">COMPANY</span>
+            <span className="text-zinc-300">CORPORATE</span>
             <a href="#" className="hover:text-zinc-500">Privacy</a>
             <a href="#" className="hover:text-zinc-500">Terms</a>
           </div>
