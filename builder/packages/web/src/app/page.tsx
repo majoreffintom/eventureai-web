@@ -2,7 +2,34 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Wand2, Monitor, Layout, Zap, Globe } from "lucide-react";
+import { 
+  ArrowRight, 
+  Wand2, 
+  Monitor, 
+  Layout, 
+  Zap, 
+  Globe, 
+  Cpu, 
+  Utensils, 
+  Smartphone, 
+  Box, 
+  Sparkles, 
+  Sun, 
+  Hammer,
+  Database,
+  Layers
+} from "lucide-react";
+
+const ecosystemApps = [
+  { name: "Heymori CMS", description: "Headless content management for the AI era.", icon: Database },
+  { name: "SwarMCP", description: "Multi-agent coordination protocol & control center.", icon: Cpu },
+  { name: "StreetEats", description: "Autonomous logistics & ordering for mobile vendors.", icon: Utensils },
+  { name: "Peggy", description: "Next-gen personal finance & automated accounting.", icon: Smartphone },
+  { name: "Ditzl", description: "Social engagement & decentralized community tools.", icon: Sparkles },
+  { name: "Nifty", description: "Digital asset management & rapid NFT deployment.", icon: Box },
+  { name: "Lumina", description: "AI-driven visual design & asset generation.", icon: Sun },
+  { name: "Contractor OS", description: "White-label HVAC, Electric, & Plumbing management.", icon: Hammer },
+];
 
 export default function Home() {
   return (
@@ -15,7 +42,7 @@ export default function Home() {
         </div>
         <div className="flex gap-8 text-sm font-medium">
           <a href="#demo" className="hover:text-zinc-500 transition-colors">DEMO</a>
-          <a href="#about" className="hover:text-zinc-500 transition-colors">ABOUT</a>
+          <a href="#ecosystem" className="hover:text-zinc-500 transition-colors">ECOSYSTEM</a>
           <Link href="/builder" className="hover:text-zinc-500 transition-colors">BUILDER</Link>
         </div>
       </nav>
@@ -149,6 +176,50 @@ export default function Home() {
                   </div>
                </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Ecosystem Section */}
+      <section id="ecosystem" className="py-24 px-6 md:px-12 border-t border-zinc-100 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col mb-16">
+            <h2 className="text-4xl font-bold tracking-tighter mb-4 uppercase">The SaaS Stack.</h2>
+            <p className="text-lg text-zinc-500 leading-snug max-w-2xl">
+              An ever-growing ecosystem of specialized SaaS applications built entirely on webMCP. 
+              From headless CMS to autonomous logistics.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-100 border border-zinc-100">
+            {ecosystemApps.map((app, i) => (
+              <motion.div 
+                key={app.name}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                viewport={{ once: true }}
+                className="bg-white p-8 group hover:bg-zinc-50 transition-colors"
+              >
+                <div className="w-10 h-10 bg-black text-white rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <app.icon size={20} />
+                </div>
+                <h3 className="text-sm font-bold uppercase tracking-widest mb-2">{app.name}</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed font-medium">
+                  {app.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-12 flex justify-between items-center py-8 border-t border-zinc-100">
+             <div className="flex items-center gap-2">
+                <Layers className="text-zinc-200" size={16} />
+                <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Powered by webMCP Engine</span>
+             </div>
+             <a href="#" className="text-[10px] font-bold uppercase tracking-widest hover:text-zinc-400 transition-colors flex items-center gap-2">
+                View Full Stack <ArrowRight size={12} />
+             </a>
           </div>
         </div>
       </section>
