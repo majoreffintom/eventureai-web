@@ -17,12 +17,13 @@ import {
   Sun, 
   Hammer,
   Database,
-  Layers
+  Layers,
+  MessageSquare
 } from "lucide-react";
 
 const ecosystemApps = [
   { name: "Heymori CMS", description: "Headless content management for the AI era.", icon: Database },
-  { name: "SwarMCP", description: "Multi-agent coordination protocol & control center.", icon: Cpu },
+  { name: "SwarMCP", description: "Multi-agent coordination via intelligent chat interface.", icon: MessageSquare },
   { name: "StreetEats", description: "Autonomous logistics & ordering for mobile vendors.", icon: Utensils },
   { name: "Peggy", description: "Next-gen personal finance & automated accounting.", icon: Smartphone },
   { name: "Ditzl", description: "Social engagement & decentralized community tools.", icon: Sparkles },
