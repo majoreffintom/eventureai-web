@@ -43,6 +43,7 @@ export default function Home() {
         <div className="flex gap-8 text-sm font-medium">
           <a href="#demo" className="hover:text-zinc-500 transition-colors">DEMO</a>
           <a href="#ecosystem" className="hover:text-zinc-500 transition-colors">ECOSYSTEM</a>
+          <Link href="/billing" className="hover:text-zinc-500 transition-colors">BILLING</Link>
           <Link href="/builder" className="hover:text-zinc-500 transition-colors">BUILDER</Link>
         </div>
       </nav>

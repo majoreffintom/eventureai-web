@@ -8,8 +8,8 @@
  */
 
 // Client
-export { createAnthropicClient } from "./client.js";
-export type { AnthropicClient } from "./client.js";
+export { createAnthropicClient, createGeminiClient } from "./client.js";
+export type { LLMClient } from "./client.js";
 
 // Types
 export type {
@@ -40,6 +40,8 @@ export type {
   ClientDefaults,
   // Model types
   ClaudeModel,
+  GeminiModel,
+  LLMModel,
 } from "./types.js";
 
 export {
@@ -66,6 +68,8 @@ export {
   BaseAgent,
   SimpleAgent,
   createAgent,
+  SwarmOrchestrator,
+  createSwarm,
 } from "./agents/index.js";
 
 export type {
@@ -138,6 +142,9 @@ export {
   createSolution,
   runTournamentWithDB,
   createDBTournamentRunner,
+  createNeonClient,
+  sql,
+  getSQL,
 } from "./db/index.js";
 
 export type {
@@ -149,6 +156,16 @@ export type {
   SQLQuery,
   DBClientConfig,
 } from "./db/index.js";
+
+// Billing Integration
+export {
+  stripe,
+  stripeService,
+} from "./billing/index.js";
+
+export type {
+  StripeSessionOptions,
+} from "./billing/index.js";
 
 // Mori Gateway (Multi-tenant LLM)
 export {
