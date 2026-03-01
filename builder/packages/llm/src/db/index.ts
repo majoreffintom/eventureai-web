@@ -43,6 +43,7 @@ export interface DBMemory {
   id: number;
   workspace_id: number | null;
   user_id: number | null;
+  app_id: number | null;
   title: string | null;
   content: string | null;
   memory_type: string | null;
@@ -296,7 +297,7 @@ export async function createMemory(
   }
 ): Promise<DBMemory> {
   const [memory] = await sql<DBMemory>`
-    INSERT INTO memory (
+    INSERT INTO memories (
       workspace_id, user_id, title, content, memory_type, tags, domain, summary
     ) VALUES (
       ${data.workspaceId || null},
@@ -314,7 +315,7 @@ export async function createMemory(
 }
 
 /**
- * Search memories by content
+ * Search memories by content using Full-Text Search
  */
 export async function searchMemories(
   sql: SQLQuery,
@@ -326,13 +327,14 @@ export async function searchMemories(
   }
 ): Promise<DBMemory[]> {
   const limit = options?.limit || 10;
-  const searchPattern = `%${query}%`;
-
+  
+  // Format query for plainto_tsquery (handles multi-word search)
   let sqlQuery = `
-    SELECT * FROM memory
-    WHERE (title ILIKE $1 OR content ILIKE $1 OR summary ILIKE $1)
+    SELECT *, ts_rank(search_tsv, plainto_tsquery('english', $1)) as rank
+    FROM memories
+    WHERE search_tsv @@ plainto_tsquery('english', $1)
   `;
-  const params: unknown[] = [searchPattern];
+  const params: unknown[] = [query];
   let paramIndex = 2;
 
   if (options?.memoryType) {
@@ -344,7 +346,7 @@ export async function searchMemories(
     params.push(options.domain);
   }
 
-  sqlQuery += ` ORDER BY created_at DESC LIMIT $${paramIndex}`;
+  sqlQuery += ` ORDER BY rank DESC, created_at DESC LIMIT $${paramIndex}`;
   params.push(limit);
 
   return sql<DBMemory>(sqlQuery as any, ...params);
@@ -355,7 +357,7 @@ export async function searchMemories(
  */
 export async function getMemoryCount(sql: SQLQuery): Promise<number> {
   const [result] = await sql<{ count: string }>`
-    SELECT COUNT(*) as count FROM memory
+    SELECT COUNT(*) as count FROM memories
   `;
   return parseInt(result.count, 10);
 }
@@ -492,3 +494,10 @@ export {
   runTournamentWithDB,
   createDBTournamentRunner,
 } from "./integration.js";
+
+// Export Neon client and helpers
+export {
+  createNeonClient,
+  sql,
+  getSQL,
+} from "./neon.js";
