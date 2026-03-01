@@ -12,11 +12,8 @@ export async function POST(req: NextRequest) {
     // Log the error chain to the database
     const chain = await createErrorChain(sql, {
       title: `Render Crash: ${elementId}`,
-      description: error,
-      errorCode: "RENDER_CRASH",
+      description: `[RENDER_CRASH] ${error}`,
       severity: "critical",
-      context: { elementId, stack, componentStack },
-      tags: ["imperative-live", "audit", elementId]
     });
 
     return new Response(JSON.stringify({ success: true, chainId: chain.id }), { status: 200 });
