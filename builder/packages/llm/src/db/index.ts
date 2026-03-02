@@ -84,14 +84,6 @@ export interface DBSolution {
 // ============================================================================
 
 /**
- * SQL query function type (matches Neon's sql template tag)
- */
-export type SQLQuery = <T = unknown>(
-  strings: TemplateStringsArray,
-  ...values: unknown[]
-) => Promise<T[]>;
-
-/**
  * Database client configuration
  */
 export interface DBClientConfig {
@@ -500,4 +492,5 @@ export {
   createNeonClient,
   sql,
   getSQL,
+  SQLQuery,
 } from "./neon.js";
