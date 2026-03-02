@@ -226,54 +226,8 @@ export const getLiveErrorsTool = defineTool({
   }
 });
 
-/**
- * Tool for capturing a screenshot of a rendered URL
- */
-export const captureScreenshotTool = defineTool({
-  name: "capture_screenshot",
-  description: "Capture a screenshot of a URL (e.g., http://localhost:3000/preview?env=dev) to 'see' the rendered output. This enables Imperative Live feedback.",
-  inputSchema: z.object({
-    url: z.string().url(),
-    width: z.number().optional().default(1280),
-    height: z.number().optional().default(800),
-  }),
-  execute: async ({ url, width, height }) => {
-    // Dynamic import to keep this server-side only and prevent bundler crashes
-    const { default: puppeteer } = await import("puppeteer");
-    
-    console.log(`📸 Capturing screenshot of ${url}...`);
-    let browser;
-    try {
-      browser = await puppeteer.launch({ 
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-      const page = await browser.newPage();
-      
-      const w = Math.floor(Number(width) || 1280);
-      const h = Math.floor(Number(height) || 800);
-      await page.setViewport({ width: w, height: h });
-      
-      // Wait for network to be idle to ensure components are loaded
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
-      
-      // Wait an extra second for any animations or client-side rendering to finish
-      await new Promise(r => setTimeout(r, 1000));
-      
-      const screenshot = await page.screenshot({ encoding: 'base64' });
-      await browser.close();
-      
-      return { 
-        url, 
-        screenshot: `data:image/png;base64,${screenshot}`,
-        message: "Screenshot captured successfully. You can now 'see' the rendered output."
-      };
-    } catch (error) {
-      if (browser) await (browser as any).close();
-      return { error: `Failed to capture screenshot: ${(error as Error).message}` };
-    }
-  }
-});
+// Note: captureScreenshotTool removed - requires puppeteer which is incompatible with edge runtime
+// If you need screenshot functionality, use a separate Node.js server or Cloudflare Worker with browser rendering
 
 export const mcpTools = {
   addComponent: addComponentTool,
@@ -284,5 +238,5 @@ export const mcpTools = {
   webResearch: webResearchTool,
   googleSearch: googleSearchTool,
   getLiveErrors: getLiveErrorsTool,
-  captureScreenshot: captureScreenshotTool,
+  // captureScreenshot: captureScreenshotTool, // Removed - puppeteer incompatible with edge runtime
 };

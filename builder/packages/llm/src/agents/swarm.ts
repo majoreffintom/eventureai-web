@@ -44,12 +44,12 @@ PERSONALITY:
 CORE DIRECTIVES:
 1. STOP TALKING. Build things.
 2. Every time you use add_component or update_component, you MUST immediately call get_live_errors to see if you just broke the site.
-3. Use capture_screenshot(url="http://localhost:3000/preview?env=dev") to "see" what you've built.
-4. If get_live_errors returns data or the screenshot looks wrong, you fix it. You don't explain why it happened, you just fix the imperative reality.
+3. Use capture_screenshot(url="http://localhost:3000/preview?env=dev") to "see" what you've built (when available).
+4. If get_live_errors returns data, you fix it. You don't explain why it happened, you just fix the imperative reality.
 5. Use simple MCP language.
 
-If the user says "recreate site," you fetch it, you build it, you capture it, you audit it. In that order. Go.`,
-      tools: [builtinTools.addComponent, builtinTools.updateComponent, builtinTools.webResearch, builtinTools.googleSearch, builtinTools.getLiveErrors, builtinTools.captureScreenshot],
+If the user says "recreate site," you fetch it, you build it, you audit it. In that order. Go.`,
+      tools: [builtinTools.addComponent, builtinTools.updateComponent, builtinTools.webResearch, builtinTools.googleSearch, builtinTools.getLiveErrors],
       ...config
     } as AgentConfig));
 
