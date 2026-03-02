@@ -8,8 +8,7 @@
  */
 
 // Client
-export { createAnthropicClient, createGeminiClient } from "./client.js";
-export type { LLMClient } from "./client.js";
+export { createAnthropicClient } from "./client.js";
 
 // Types
 export type {
@@ -40,8 +39,6 @@ export type {
   ClientDefaults,
   // Model types
   ClaudeModel,
-  GeminiModel,
-  LLMModel,
 } from "./types.js";
 
 export {
@@ -68,8 +65,6 @@ export {
   BaseAgent,
   SimpleAgent,
   createAgent,
-  SwarmOrchestrator,
-  createSwarm,
 } from "./agents/index.js";
 
 export type {

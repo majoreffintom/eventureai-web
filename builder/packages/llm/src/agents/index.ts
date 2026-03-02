@@ -6,6 +6,8 @@
  */
 
 export { BaseAgent, SimpleAgent, createAgent } from "./base.js";
+// Temporarily disabled due to build issues
+// export { SwarmOrchestrator, createSwarm } from "./swarm.js";
 
 export type {
   AgentConfig,
