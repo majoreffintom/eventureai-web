@@ -13,6 +13,15 @@
 // Types matching existing database schema
 // ============================================================================
 
+/**
+ * SQL query function type (matches Neon's sql template tag)
+ * Duplicated here to avoid circular dependency with neon.ts
+ */
+export type SQLQuery = <T = unknown>(
+  strings: TemplateStringsArray,
+  ...values: unknown[]
+) => Promise<T[]>;
+
 export interface DBTournament {
   id: number;
   app_id: number | null;
@@ -492,5 +501,4 @@ export {
   createNeonClient,
   sql,
   getSQL,
-  SQLQuery,
 } from "./neon.js";
