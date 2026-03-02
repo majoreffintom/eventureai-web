@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripeService } from "@eventureai/builder-llm";
 
+export const runtime = 'edge';
+
 export async function POST(req: NextRequest) {
   try {
     const { planId, tenantId, customerEmail } = await req.json();

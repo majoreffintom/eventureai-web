@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createAnthropicClient } from "@eventureai/builder-llm";
 
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {

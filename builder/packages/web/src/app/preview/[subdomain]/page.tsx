@@ -2,6 +2,7 @@ import { getSQL } from "@eventureai/builder-llm";
 import { PreviewClient } from "../PreviewClient";
 import { notFound } from "next/navigation";
 
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export default async function SubdomainPage({ params }: { params: { subdomain: string } }) {

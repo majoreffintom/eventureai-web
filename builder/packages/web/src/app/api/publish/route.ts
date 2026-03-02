@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import { getSQL } from "@eventureai/builder-llm";
 
+export const runtime = 'edge';
+
 export async function POST(req: NextRequest) {
   try {
     const { elements, appId, env, subdomain } = await req.json();

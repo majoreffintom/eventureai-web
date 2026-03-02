@@ -1,6 +1,7 @@
 import { getSQL } from "@eventureai/builder-llm";
 import { PreviewClient } from "./PreviewClient";
 
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export default async function PreviewPage({ searchParams }: { searchParams: { env?: string } }) {
