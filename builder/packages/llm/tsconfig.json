@@ -6,12 +6,17 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "strict": true,
+    "strict": false,
+    "noImplicitAny": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "resolveJsonModule": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "ts-node": {
+    "esm": true
+  }
 }
