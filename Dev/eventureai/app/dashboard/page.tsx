@@ -223,9 +223,12 @@ export default function OrganizationDashboard() {
               <p className="text-white/80 text-sm mb-6">
                 Open the design engine to modify themes for your 55 custom templates.
               </p>
-              <button className="w-full py-3 bg-white/20 hover:bg-white/30 rounded-2xl font-semibold backdrop-blur-md transition-colors text-center">
+              <a 
+                href="/builder"
+                className="block w-full py-3 bg-white/20 hover:bg-white/30 rounded-2xl font-semibold backdrop-blur-md transition-colors text-center"
+              >
                 Launch Engine
-              </button>
+              </a>
             </IOSCard>
           </div>
         </div>

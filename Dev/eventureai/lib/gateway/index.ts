@@ -30,8 +30,11 @@ export class MoriGatewayClient {
       timeout: config.timeout || 120000,
     };
 
-    // Initialize Anthropic client
-    this.anthropicClient = new Anthropic({ apiKey: this.config.apiKey });
+    // Initialize Anthropic client with optional baseURL
+    this.anthropicClient = new Anthropic({ 
+      apiKey: this.config.apiKey,
+      baseURL: this.config.baseUrl || undefined,
+    });
   }
 
   /**

@@ -1,19 +1,19 @@
 import { z } from "zod";
-import { ToolDefinition, ToolInputSchema, ToolExecutionContext } from "../types.js";
+import { ToolDefinition, ToolExecutionContext } from "../types.js";
 
 /**
  * Helper function to define a tool with type safety
  * @param config - Tool configuration
  * @returns ToolDefinition instance
  */
-export function defineTool<TInput, TOutput>(
+export function defineTool<TSchema extends z.ZodTypeAny, TOutput>(
   config: {
     name: string;
     description: string;
-    inputSchema: ToolInputSchema;
-    execute: (input: TInput, context?: ToolExecutionContext) => Promise<TOutput> | TOutput;
+    inputSchema: TSchema;
+    execute: (input: z.infer<TSchema>, context?: ToolExecutionContext) => Promise<TOutput> | TOutput;
   }
-): ToolDefinition<TInput, TOutput> {
+): ToolDefinition<z.infer<TSchema>, TOutput> {
   return {
     name: config.name,
     description: config.description,
@@ -124,7 +124,7 @@ export async function executeTool<TInput, TOutput>(
 export class ToolBuilder<TInput = unknown, TOutput = unknown> {
   private _name?: string;
   private _description?: string;
-  private _inputSchema?: ToolInputSchema;
+  private _inputSchema?: z.ZodTypeAny;
   private _execute?: (input: TInput, context?: ToolExecutionContext) => Promise<TOutput> | TOutput;
 
   name(name: string): this {

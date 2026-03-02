@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cf": "npx @cloudflare/next-on-pages",
+    "build:cf": "node -e \"require('fs').mkdirSync('node_modules/async_hooks',{recursive:true});require('fs').writeFileSync('node_modules/async_hooks/index.js','module.exports={AsyncLocalStorage:class{getStore(){return this._s}run(s,f,...a){const p=this._s;this._s=s;try{return f(...a)}finally{this._s=p}}enterWith(s){this._s=s}disable(){this._s=void 0}}}\")\" && npx @cloudflare/next-on-pages",
     "start": "next start",
     "lint": "next lint"
   },

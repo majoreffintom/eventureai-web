@@ -1,4 +1,4 @@
-import { Message, ToolDefinition, StreamCallbacks } from "../types.js";
+import { Message, ToolDefinition, StreamCallbacks, ToolChoice, LLMModel } from "../types.js";
 
 /**
  * Configuration for creating an agent
@@ -10,7 +10,7 @@ export interface AgentConfig {
   tools?: ToolDefinition[];
   maxTokens?: number;
   temperature?: number;
-  model?: string;
+  model?: LLMModel;
 }
 
 /**
@@ -22,9 +22,12 @@ export interface AgentExecuteOptions {
   toolsOverride?: ToolDefinition[];
   maxTokensOverride?: number;
   temperatureOverride?: number;
-  modelOverride?: string;
+  modelOverride?: LLMModel;
   stream?: boolean;
   callbacks?: StreamCallbacks;
+  eventHandler?: AgentEventHandler;
+  context?: Record<string, any>;
+  toolChoice?: ToolChoice;
 }
 
 /**

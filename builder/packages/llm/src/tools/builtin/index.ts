@@ -10,6 +10,8 @@
 // export { writeFileTool } from './write-file.js';
 // export { searchTool } from './search.js';
 
+import { mcpTools } from "./mcp.js";
+
 export const builtinTools = {
-  // Add built-in tool instances here
+  ...mcpTools,
 };

@@ -1,4 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
 import {
   Message,
   ToolDefinition,
@@ -7,8 +6,10 @@ import {
   DEFAULT_MODEL,
   DEFAULT_MAX_TOKENS,
   DEFAULT_TEMPERATURE,
+  ToolChoice,
+  LLMModel,
 } from "../types.js";
-import { createAnthropicClient, AnthropicClient } from "../client.js";
+import { createAnthropicClient, LLMClient } from "../client.js";
 import { executeTool, ToolExecutionError } from "../tools/base.js";
 import {
   AgentConfig,
@@ -25,18 +26,18 @@ import {
 /**
  * Abstract base class for creating AI agents
  *
- * Provides common functionality for interacting with Anthropic's Claude API
+ * Provides common functionality for interacting with LLM APIs
  * including streaming responses and tool execution.
  */
 export abstract class BaseAgent {
-  protected client: AnthropicClient;
+  protected client: LLMClient;
   protected _name: string;
   protected _description: string;
   protected _systemPrompt: string;
   protected _tools: ToolDefinition[];
   protected _maxTokens: number;
   protected _temperature: number;
-  protected _model: string;
+  protected _model: LLMModel;
   protected _state: AgentState = "idle";
   protected _eventHandlers: Set<AgentEventHandler> = new Set();
   protected _stats: AgentStats = {
@@ -46,7 +47,7 @@ export abstract class BaseAgent {
     averageResponseTime: 0,
   };
 
-  constructor(config: AgentConfig, client?: AnthropicClient) {
+  constructor(config: AgentConfig, client?: LLMClient) {
     this._name = config.name;
     this._description = config.description ?? "";
     this._systemPrompt = config.systemPrompt;
@@ -108,7 +109,7 @@ export abstract class BaseAgent {
       supportsStreaming: true,
       supportsToolUse: this._tools.length > 0,
       supportsVision: true,
-      maxContextLength: 200000, // Claude's context window
+      maxContextLength: 200000,
     };
   }
 
@@ -172,7 +173,7 @@ export abstract class BaseAgent {
   }
 
   /**
-   * Helper method to stream a response from Claude
+   * Helper method to stream a response from LLM
    * Handles the streaming lifecycle including tool execution
    */
   protected async streamResponse(
@@ -182,12 +183,13 @@ export abstract class BaseAgent {
       tools?: ToolDefinition[];
       maxTokens?: number;
       temperature?: number;
-      model?: string;
+      model?: LLMModel;
       executeTools?: boolean;
+      context?: Record<string, any>;
+      toolChoice?: ToolChoice;
     } = {},
     callbacks?: StreamCallbacks
   ): Promise<AgentResult> {
-    const startTime = Date.now();
     this.setState("thinking");
 
     const systemPrompt = options.systemPrompt ?? this._systemPrompt;
@@ -195,7 +197,7 @@ export abstract class BaseAgent {
     const maxTokens = options.maxTokens ?? this._maxTokens;
     const temperature = options.temperature ?? this._temperature;
     const model = options.model ?? this._model;
-    const executeTools = options.executeTools ?? true;
+    const toolChoice = options.toolChoice;
 
     const enhancedCallbacks: StreamCallbacks = {
       ...callbacks,
@@ -206,118 +208,35 @@ export abstract class BaseAgent {
       onToolUse: (toolName, toolUseId, input) => {
         this.setState("tool_use");
         callbacks?.onToolUse?.(toolName, toolUseId, input);
-        this.emitEvent({
-          type: "tool_call",
-          toolName,
-          toolUseId,
-          input,
-        });
       },
       onError: (error) => {
         this.setState("error");
         callbacks?.onError?.(error);
-        this.emitEvent({ type: "error", error });
       },
+      onMessageStop: () => {
+        this.setState("idle");
+        callbacks?.onMessageStop?.();
+      }
     };
 
-    try {
-      const response = await this.client.streamMessage(
-        messages,
-        {
-          systemPrompt,
-          tools,
-          maxTokens,
-          temperature,
-          model,
-        },
-        enhancedCallbacks
-      );
+    // This now returns immediately without waiting for the full response
+    await this.client.streamMessage(
+      messages,
+      {
+        systemPrompt,
+        tools,
+        maxTokens,
+        temperature,
+        model,
+        toolChoice,
+      },
+      enhancedCallbacks
+    );
 
-      // Process tool calls if any
-      const toolCalls: ToolCallResult[] = [];
-      if (executeTools && response.content) {
-        for (const block of response.content) {
-          if (block.type === "tool_use") {
-            const tool = tools.find((t) => t.name === block.name);
-            if (tool) {
-              try {
-                const result = await executeTool(tool, block.input, {
-                  messages,
-                  toolUseId: block.id,
-                });
-
-                const toolCallResult: ToolCallResult = {
-                  toolName: block.name,
-                  toolUseId: block.id,
-                  input: block.input,
-                  output: result,
-                };
-                toolCalls.push(toolCallResult);
-
-                this.emitEvent({
-                  type: "tool_result",
-                  toolUseId: block.id,
-                  result,
-                });
-
-                callbacks?.onToolResult?.(block.id, result);
-              } catch (error) {
-                const toolCallResult: ToolCallResult = {
-                  toolName: block.name,
-                  toolUseId: block.id,
-                  input: block.input,
-                  output: error instanceof Error ? error.message : String(error),
-                  isError: true,
-                };
-                toolCalls.push(toolCallResult);
-
-                this.emitEvent({
-                  type: "tool_result",
-                  toolUseId: block.id,
-                  result: error,
-                  isError: true,
-                });
-              }
-              this._stats.totalToolCalls++;
-            }
-          }
-        }
-      }
-
-      // Convert response to Message format
-      const assistantMessage: AssistantMessage = {
-        role: "assistant",
-        content: response.content as unknown as AssistantMessage["content"],
-        stopReason: response.stop_reason ?? undefined,
-      };
-
-      // Update stats
-      const executionTime = Date.now() - startTime;
-      this._stats.totalMessages++;
-      this._stats.totalTokensUsed += (response.usage?.input_tokens ?? 0) + (response.usage?.output_tokens ?? 0);
-      this._stats.averageResponseTime =
-        (this._stats.averageResponseTime * (this._stats.totalMessages - 1) + executionTime) /
-        this._stats.totalMessages;
-      this._stats.lastExecutionTime = new Date();
-
-      this.setState("idle");
-
-      return {
-        message: assistantMessage,
-        toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
-        usage: response.usage
-          ? {
-              inputTokens: response.usage.input_tokens,
-              outputTokens: response.usage.output_tokens,
-            }
-          : undefined,
-      };
-    } catch (error) {
-      this.setState("error");
-      const err = error instanceof Error ? error : new Error(String(error));
-      this.emitEvent({ type: "error", error: err });
-      throw err;
-    }
+    // Return a placeholder result since the actual results will come via callbacks
+    return {
+      message: { role: "assistant", content: [] },
+    };
   }
 
   /**
@@ -330,7 +249,8 @@ export abstract class BaseAgent {
       tools?: ToolDefinition[];
       maxTokens?: number;
       temperature?: number;
-      model?: string;
+      model?: LLMModel;
+      toolChoice?: ToolChoice;
     } = {}
   ): Promise<AgentResult> {
     const startTime = Date.now();
@@ -343,6 +263,7 @@ export abstract class BaseAgent {
         maxTokens: options.maxTokens ?? this._maxTokens,
         temperature: options.temperature ?? this._temperature,
         model: options.model ?? this._model,
+        toolChoice: options.toolChoice,
       });
 
       // Convert response to Message format
@@ -386,27 +307,40 @@ export class SimpleAgent extends BaseAgent {
   async execute(options: AgentExecuteOptions): Promise<AgentResult> {
     const shouldStream = options.stream ?? true;
 
-    if (shouldStream) {
-      return this.streamResponse(
-        options.messages,
-        {
-          systemPrompt: options.systemPromptOverride,
-          tools: options.toolsOverride,
-          maxTokens: options.maxTokensOverride,
-          temperature: options.temperatureOverride,
-          model: options.modelOverride,
-        },
-        options.callbacks
-      );
+    if (options.eventHandler) {
+      this.on(options.eventHandler);
     }
 
-    return this.createResponse(options.messages, {
-      systemPrompt: options.systemPromptOverride,
-      tools: options.toolsOverride,
-      maxTokens: options.maxTokensOverride,
-      temperature: options.temperatureOverride,
-      model: options.modelOverride,
-    });
+    try {
+      if (shouldStream) {
+        return await this.streamResponse(
+          options.messages,
+          {
+            systemPrompt: options.systemPromptOverride,
+            tools: options.toolsOverride,
+            maxTokens: options.maxTokensOverride,
+            temperature: options.temperatureOverride,
+            model: options.modelOverride as LLMModel | undefined,
+            context: options.context,
+            toolChoice: options.toolChoice,
+          },
+          options.callbacks
+        );
+      }
+
+      return await this.createResponse(options.messages, {
+        systemPrompt: options.systemPromptOverride,
+        tools: options.toolsOverride,
+        maxTokens: options.maxTokensOverride,
+        temperature: options.temperatureOverride,
+        model: options.modelOverride as LLMModel | undefined,
+        toolChoice: options.toolChoice,
+      });
+    } finally {
+      if (options.eventHandler) {
+        this.off(options.eventHandler);
+      }
+    }
   }
 }
 
@@ -420,12 +354,12 @@ export function createAgent(
     tools?: ToolDefinition[];
     maxTokens?: number;
     temperature?: number;
-    model?: string;
+    model?: LLMModel;
   } = {}
 ): SimpleAgent {
   return new SimpleAgent({
     name,
     systemPrompt,
     ...options,
-  });
+  } as AgentConfig);
 }

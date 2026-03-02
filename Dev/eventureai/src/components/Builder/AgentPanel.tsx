@@ -93,14 +93,20 @@ export default function AgentPanel({ selectedAgent, onSelectAgent, memoryCount, 
           <ChevronRight size={12} className={`transition-transform ${expanded.tournament ? 'rotate-90' : ''}`} />
         </button>
         {expanded.tournament && (
-          <div className="mt-1 px-3 py-2.5">
+          <div className="mt-1 px-3 py-2.5 space-y-3">
             <div className="flex items-center gap-2">
               <Trophy size={16} className={tournamentStatus === 'running' ? 'text-yellow-500' : 'text-black/40'} />
               <span className="text-sm text-black/60">
-                {tournamentStatus === 'running' ? 'Running...' : tournamentStatus === 'ready' ? 'Ready' : 'No active tournament'}
+                {tournamentStatus === 'running' ? 'Running...' : 'Ready to Start'}
               </span>
               {tournamentStatus === 'running' && <Loader2 size={14} className="animate-spin text-blue-500" />}
             </div>
+            <a 
+              href="/builder/tournament"
+              className="block w-full text-center py-2 text-[10px] font-bold uppercase tracking-widest bg-black text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Launch Tournament
+            </a>
           </div>
         )}
       </div>

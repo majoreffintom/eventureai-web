@@ -33,7 +33,7 @@ export default function AppBuilder() {
   useEffect(() => {
     async function fetchTenants() {
       try {
-        const response = await fetch("/api/organizations"); // Our sync script verified this lists tenants
+        const response = await fetch("/api/tenants"); // Correct endpoint for tenants
         const data = await response.json();
         if (Array.isArray(data)) {
           setTenants(data);

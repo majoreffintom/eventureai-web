@@ -2,6 +2,15 @@ import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 
 // ============================================================================
+// Tool Choice Types
+// ============================================================================
+
+export type ToolChoice =
+  | { type: "auto" }
+  | { type: "any" }
+  | { type: "tool"; name: string };
+
+// ============================================================================
 // Message Types
 // ============================================================================
 
@@ -51,7 +60,7 @@ export type Message = UserMessage | AssistantMessage | ToolResultMessage;
 // Tool Definition Types
 // ============================================================================
 
-export type ToolInputSchema = z.ZodType<unknown>;
+export type ToolInputSchema = z.ZodTypeAny;
 
 export interface ToolDefinition<TInput = unknown, TOutput = unknown> {
   name: string;
@@ -69,6 +78,7 @@ export interface ToolConfig {
 export interface ToolExecutionContext {
   messages: Message[];
   toolUseId: string;
+  context?: Record<string, any>;
 }
 
 // ============================================================================
@@ -83,6 +93,7 @@ export interface ConversationOptions {
   maxTokens?: number;
   temperature?: number;
   model?: string;
+  toolChoice?: ToolChoice;
 }
 
 export interface Conversation {
@@ -95,6 +106,7 @@ export interface Conversation {
   model: string;
   createdAt: Date;
   updatedAt: Date;
+  toolChoice?: ToolChoice;
 }
 
 // ============================================================================
@@ -157,6 +169,21 @@ export type ClaudeModel =
   | "claude-3-sonnet-20240229"
   | "claude-3-haiku-20240307";
 
-export const DEFAULT_MODEL: ClaudeModel = "claude-sonnet-4-20250514";
+export type GeminiModel =
+  | "gemini-1.5-pro"
+  | "gemini-1.5-flash"
+  | "gemini-2.0-flash-exp"
+  | "gemini-2.0-flash";
+
+export type LLMModel = ClaudeModel | GeminiModel;
+
+// Check environment for keys - prefer Gemini if Claude is set to 0
+const hasClaude = process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== '0';
+const hasGemini = !!process.env.GOOGLE_API_KEY;
+
+export const DEFAULT_MODEL: LLMModel = (hasClaude) 
+  ? "claude-sonnet-4-20250514" 
+  : (hasGemini ? "gemini-1.5-pro" : "claude-sonnet-4-20250514");
+
 export const DEFAULT_MAX_TOKENS = 4096;
 export const DEFAULT_TEMPERATURE = 1.0;

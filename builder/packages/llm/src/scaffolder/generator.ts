@@ -49,15 +49,10 @@ export async function generateProject(
     ? `\n\nRequested features:\n${options.features.map((f) => `- ${f}`).join("\n")}`
     : "";
 
-  const response = await client.client.messages.create({
-    model,
-    max_tokens: 8192,
-    temperature: 0.7,
-    system: systemPrompt,
-    messages: [
-      {
-        role: "user",
-        content: `Create a project named "${name}" with the following description:
+  const response = await client.createMessage([
+    {
+      role: "user",
+      content: `Create a project named "${name}" with the following description:
 
 ${description}${featuresList}
 
@@ -79,8 +74,12 @@ Respond with a valid JSON object matching this schema:
     "script-name": "command"
   }
 }`,
-      },
-    ],
+    },
+  ], {
+    model,
+    maxTokens: 8192,
+    temperature: 0.7,
+    systemPrompt,
   });
 
   // Parse the response
