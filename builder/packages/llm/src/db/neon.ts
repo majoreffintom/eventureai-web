@@ -1,5 +1,13 @@
 import { neon } from '@neondatabase/serverless';
-import type { SQLQuery } from './index.js';
+
+/**
+ * SQL query function type (matches Neon's sql template tag)
+ * Duplicated to avoid circular dependency
+ */
+type SQLQuery = <T = unknown>(
+  strings: TemplateStringsArray,
+  ...values: unknown[]
+) => Promise<T[]>;
 
 /**
  * Create a Neon SQL client from a connection string
